@@ -8,8 +8,8 @@ app.use(function(req, res, next) {
 });
 
 app.get('/', function(req, res) {
-    const randomNum = Math.floor(Math.random() * max);
-    res.send(randomNum);
+    const randomNum = Math.floor(Math.random() * 10);
+    res.send({ num: '' + randomNum });
 });
 
 let port = process.env.PORT;
