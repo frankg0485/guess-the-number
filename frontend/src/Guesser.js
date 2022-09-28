@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
 
 function Guesser() {
+    const messages = {
+      newNumber: "A new number has been generated. Good luck!",
+      wrongGuess: "Not quite...",
+      gameOver: "Game over ;(",
+      rightGuess: "Correct!!",
+    };
     const [prevAnswer, setPrevAnswer] = useState(0);
     const [number, setNumber] = useState(getRandomNumber);
     const [guess, setGuess] = useState("");
@@ -22,7 +28,6 @@ function Guesser() {
       setShowAnswer(true);
       setPrevAnswer(number);
       setGuessesRemaining(5);
-      setAnswerMessage("A new number has been generated. Good luck!")
       getRandomNumber();
     }
 
@@ -32,18 +37,18 @@ function Guesser() {
       let newMsg = "";
       let shouldReset = false;
       if (parseInt(guess) == number) {
-        newMsg = "Correct!!";
+        newMsg = messages.rightGuess;
         shouldReset = true;
       } else if (guessesRemaining == 1) {
-        newMsg = "Game over ;(";
+        newMsg = messages.gameOver;
         shouldReset = true;
       } else {
-        newMsg = "Not quite...";
+        newMsg = messages.wrongGuess;
       }
       
 
       if (shouldReset) { reset(); }
-      
+      setAnswerMessage(newMsg);
       return false;
     }
 
@@ -60,7 +65,7 @@ function Guesser() {
           <button onClick={makeGuess} disabled={!guess || isNaN(+guess)}>
             Guess!
           </button>
-          <p>{answerMessage}</p>
+          <p className={showAnswer ? 'fadeOut' : 'fadeIn'} onTransitionEnd={() => setAnswerMessage(messages.newNumber)}>{answerMessage}</p>
           <button onClick={reset} disabled={guessesRemaining == 5}>
             Give up :&#40;
           </button>
