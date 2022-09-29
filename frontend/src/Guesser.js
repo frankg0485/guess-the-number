@@ -14,11 +14,11 @@ function Guesser() {
     const [guessesRemaining, setGuessesRemaining] = useState(5);
     const [showAnswer, setShowAnswer] = useState(false);
     const [score, setScore] = useState(0);
-    let lowerBound = 0;
-    let upperBound = 10;
+    const [lowerBound, setLowerBound] = useState(1);
+    const [upperBound, setUpperBound] = useState(10);
 
     function getRandomNumber() {
-        fetch('http://localhost:5000/')
+        fetch(`http://localhost:5000/?lower=${lowerBound}&upper=${upperBound}`)
         .then(res => res.json())
         .then(obj => {
             setNumber(obj.num);
@@ -51,11 +51,17 @@ function Guesser() {
       }
       
 
+      setGuess("");
       if (shouldReset) { reset(); }
       setAnswerMessage(newMsg);
       return false;
     }
 
+    function handleKeyDown(event) {
+      if (event.keyCode === 13) {
+        makeGuess();
+      }
+    }
 
     return (
         <div>
@@ -65,7 +71,7 @@ function Guesser() {
             <p style={{flex: 1}}>
               Lower bound:
             </p>
-            <input style={{flex: 1}} type="text" name="guess" value={guess} onChange={(e) => setGuess(e.target.value)}/>
+            <input style={{flex: 1}} type="text" name="guess" value={lowerBound} onChange={(e) => setLowerBound(e.target.value)}/>
             <span style={{flex: 2}} />
           </div>
           <div style={{display: "flex", flexDirection: "row", alignItems: "center"}}>
@@ -73,7 +79,7 @@ function Guesser() {
             <p style={{flex: 1}}>
               Upper bound:
             </p>
-            <input style={{flex: 1}} type="text" name="guess" value={guess} onChange={(e) => setGuess(e.target.value)}/>
+            <input style={{flex: 1}} type="text" name="guess" value={upperBound} onChange={(e) => setUpperBound(e.target.value)}/>
             <span style={{flex: 2}} />          </div>
           <h2>
             {"Score: " + score}
@@ -81,7 +87,7 @@ function Guesser() {
           <h3>
             {"Guesses remaining: " + guessesRemaining}
           </h3>
-          <input type="text" name="guess" value={guess} onChange={(e) => setGuess(e.target.value)}/>
+          <input type="text" name="guess" value={guess} onKeyUp={handleKeyDown} onChange={(e) => setGuess(e.target.value)}/>
           <button onClick={makeGuess} disabled={!guess || isNaN(+guess)}>
             Guess!
           </button>

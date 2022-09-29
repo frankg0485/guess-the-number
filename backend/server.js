@@ -8,8 +8,13 @@ app.use(function(req, res, next) {
 });
 
 app.get('/', function(req, res) {
-    const randomNum = Math.floor(Math.random() * 10);
-    res.send({ num: '' + randomNum });
+  const lower = parseInt(req.query.lower);
+  const upper = parseInt(req.query.upper);
+  /*console.log(req.query.lower);
+  console.log(req.query.upper);*/
+  const randomNum = Math.floor(Math.random() * (upper - lower + 1)) + lower;
+  console.log(randomNum)
+  res.send({ num: '' + randomNum });
 });
 
 let port = process.env.PORT;
