@@ -3,12 +3,13 @@ import React, { useState } from 'react';
 function Guesser() {
     const messages = {
       newNumber: "A new number has been generated. Good luck!",
-      wrongGuess: "Not quite...",
+      high: "Too high...",
+      low: "Too low...",
       gameOver: "Better luck next time :|",
       rightGuess: "Correct!!",
     };
+
     const [prevAnswer, setPrevAnswer] = useState(0);
-    const [number, setNumber] = useState(getRandomNumber);
     const [guess, setGuess] = useState("");
     const [answerMessage, setAnswerMessage] = useState("Good luck!");
     const [guessesRemaining, setGuessesRemaining] = useState(5);
@@ -16,6 +17,7 @@ function Guesser() {
     const [score, setScore] = useState(0);
     const [lowerBound, setLowerBound] = useState(1);
     const [upperBound, setUpperBound] = useState(10);
+    const [number, setNumber] = useState(getRandomNumber);
 
     function getRandomNumber() {
         fetch(`http://localhost:5000/?lower=${lowerBound}&upper=${upperBound}`)
@@ -39,15 +41,19 @@ function Guesser() {
 
       let newMsg = "";
       let shouldReset = false;
-      if (parseInt(guess) == number) {
+      let guessNum = parseInt(guess);
+
+      if (guessNum == number) {
         newMsg = messages.rightGuess;
         setScore(score + 1);
         shouldReset = true;
       } else if (guessesRemaining == 1) {
         newMsg = messages.gameOver;
         shouldReset = true;
-      } else {
-        newMsg = messages.wrongGuess;
+      } else if (guessNum > number) {
+        newMsg = messages.high;
+      } else if (guessNum < number) {
+        newMsg = messages.low;
       }
       
 
@@ -58,9 +64,13 @@ function Guesser() {
     }
 
     function handleKeyDown(event) {
-      if (event.keyCode === 13) {
+      if (isNumber(guess) && event.keyCode === 13) {
         makeGuess();
       }
+    }
+
+    function isNumber(numStr) {
+      return numStr && !isNaN(+numStr);
     }
 
     return (
@@ -71,7 +81,7 @@ function Guesser() {
             <p style={{flex: 1}}>
               Lower bound:
             </p>
-            <input style={{flex: 1}} type="text" name="guess" value={lowerBound} onChange={(e) => setLowerBound(e.target.value)}/>
+            <input style={{flex: 1}} type="text" name="lowBound" value={lowerBound} onChange={(e) => setLowerBound(e.target.value)}/>
             <span style={{flex: 2}} />
           </div>
           <div style={{display: "flex", flexDirection: "row", alignItems: "center"}}>
@@ -79,7 +89,7 @@ function Guesser() {
             <p style={{flex: 1}}>
               Upper bound:
             </p>
-            <input style={{flex: 1}} type="text" name="guess" value={upperBound} onChange={(e) => setUpperBound(e.target.value)}/>
+            <input style={{flex: 1}} type="text" name="highBound" value={upperBound} onChange={(e) => setUpperBound(e.target.value)}/>
             <span style={{flex: 2}} />          </div>
           <h2>
             {"Score: " + score}
@@ -88,7 +98,7 @@ function Guesser() {
             {"Guesses remaining: " + guessesRemaining}
           </h3>
           <input type="text" name="guess" value={guess} onKeyUp={handleKeyDown} onChange={(e) => setGuess(e.target.value)}/>
-          <button onClick={makeGuess} disabled={!guess || isNaN(+guess)}>
+          <button onClick={makeGuess} disabled={!isNumber(guess)}>
             Guess!
           </button>
           <p className={showAnswer ? 'fadeOut' : 'fadeIn'} onTransitionEnd={() => setAnswerMessage(messages.newNumber)}>{answerMessage}</p>
